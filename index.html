@@ -440,9 +440,9 @@
                         </button>
                     </div>
 
-                    <!-- Stock List -->
+                    <!-- Stock & Product Info List -->
                     <div class="space-y-4">
-                        <h4 class="font-bold text-sm text-gray-800">Senarai Baki Stok Mengikut Design:</h4>
+                        <h4 class="font-bold text-sm text-gray-800">Senarai Baki Stok &amp; Tetapan Gambar Bouquet:</h4>
                         <div id="adminStockControlList" class="space-y-3">
                             <!-- Loaded via JS -->
                         </div>
@@ -559,7 +559,7 @@
         <span id="toastIcon" class="text-lg">✅</span>
         <span id="toastMessage" class="text-xs font-bold">Mesej Notifikasi</span>
     </div>
-const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-43370-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
     <!-- Custom Confirm Dialog -->
     <div id="customDialogModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center space-y-4">
@@ -1161,32 +1161,63 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-43370-default-rtdb.asia-south
 
             products.forEach((p, index) => {
                 const card = document.createElement('div');
-                card.className = "bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4";
+                card.className = "bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col space-y-3";
                 card.innerHTML = `
-                    <div class="flex items-center space-x-3">
-                        <img src="${p.image}" class="w-12 h-12 rounded-lg object-cover border border-gray-200" onerror="this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
-                        <div>
-                            <span class="text-[10px] font-bold text-shopee uppercase">${p.code}</span>
-                            <h5 class="font-bold text-sm text-gray-900">${p.name}</h5>
-                            <div class="text-xs text-gray-500">Harga: RM ${p.price.toFixed(2)} | Baki Stok: <strong class="${p.stock <= 0 ? 'text-red-600 font-extrabold' : 'text-emerald-600 font-bold'}">${p.stock} pcs</strong></div>
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div class="flex items-center space-x-3">
+                            <img src="${p.image}" class="w-14 h-14 rounded-lg object-cover border border-gray-200 shrink-0" onerror="this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
+                            <div>
+                                <span class="text-[10px] font-bold text-shopee uppercase">${p.code}</span>
+                                <h5 class="font-bold text-sm text-gray-900">${p.name}</h5>
+                                <div class="text-xs text-gray-500">Harga: RM ${p.price.toFixed(2)} | Baki Stok: <strong class="${p.stock <= 0 ? 'text-red-600 font-extrabold' : 'text-emerald-600 font-bold'}">${p.stock} pcs</strong></div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                            <button onclick="updateSingleStock(${index}, -5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">-5</button>
+                            <input type="number" id="inputStock_${index}" value="${p.stock}" min="0" class="w-16 text-center font-bold text-sm bg-gray-50 border border-gray-300 rounded-lg py-1 focus:ring-2 focus:ring-shopee focus:outline-none">
+                            <button onclick="updateSingleStock(${index}, 5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">+5</button>
+                            
+                            <button onclick="saveStockFromInput(${index})" class="bg-gray-900 hover:bg-black text-white font-bold text-xs px-3 py-1.5 rounded-lg transition ml-2">
+                                Simpan Stok
+                            </button>
+                            <button onclick="resetSingleStockTo30(${index})" title="Reset ke 30" class="bg-orange-100 text-shopee hover:bg-shopee hover:text-white font-bold text-xs px-3 py-1.5 rounded-lg transition">
+                                Set 30
+                            </button>
                         </div>
                     </div>
 
-                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                        <button onclick="updateSingleStock(${index}, -5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">-5</button>
-                        <input type="number" id="inputStock_${index}" value="${p.stock}" min="0" class="w-16 text-center font-bold text-sm bg-gray-50 border border-gray-300 rounded-lg py-1 focus:ring-2 focus:ring-shopee focus:outline-none">
-                        <button onclick="updateSingleStock(${index}, 5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">+5</button>
-                        
-                        <button onclick="saveStockFromInput(${index})" class="bg-gray-900 hover:bg-black text-white font-bold text-xs px-3 py-1.5 rounded-lg transition ml-2">
-                            Simpan
-                        </button>
-                        <button onclick="resetSingleStockTo30(${index})" title="Reset ke 30" class="bg-orange-100 text-shopee hover:bg-shopee hover:text-white font-bold text-xs px-3 py-1.5 rounded-lg transition">
-                            Set 30
+                    <!-- Image URL Edit Input -->
+                    <div class="pt-2 border-t border-gray-100 flex flex-col sm:flex-row gap-2 items-center">
+                        <label class="text-[11px] font-bold text-gray-600 shrink-0">URL Gambar (${p.code}):</label>
+                        <input type="text" id="inputImg_${index}" value="${p.image}" placeholder="https://..." class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-1 text-xs focus:ring-2 focus:ring-shopee focus:outline-none">
+                        <button onclick="saveImageFromInput(${index})" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shrink-0">
+                            Tukar Gambar
                         </button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function saveImageFromInput(index) {
+            const newImgUrl = document.getElementById(`inputImg_${index}`).value.trim();
+            if (!newImgUrl) {
+                showToast("Sila masukkan URL gambar yang sah!", "warning");
+                return;
+            }
+
+            products[index].image = newImgUrl;
+
+            if (isFirebaseConnected && dbRef) {
+                dbRef.ref(`skaj_bouquet/products/${index}/image`).set(newImgUrl);
+                showToast(`Gambar ${products[index].code} berjaya ditukar!`, "success");
+            } else {
+                saveProductsToLocalStorage();
+                renderProducts();
+                renderAdminStockControl();
+                showToast(`Gambar ${products[index].code} berjaya ditukar!`, "success");
+            }
         }
 
         function updateSingleStock(index, delta) {
