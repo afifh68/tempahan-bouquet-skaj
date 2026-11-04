@@ -477,13 +477,16 @@
                     </div>
 
                     <div class="border-t border-gray-200 pt-4">
-                        <h4 class="font-bold text-sm text-gray-800 mb-1">Mod Pangkalan Data (Akses Admin)</h4>
-                        <p class="text-xs text-gray-500 mb-2">Tetapan mod demo atau sambungan Firebase Realtime Database diuruskan di sini.</p>
+                        <h4 class="font-bold text-sm text-gray-800 mb-1">Pangkalan Data Firebase Realtime</h4>
+                        <p class="text-xs text-gray-500 mb-2">Semua data stok, tempahan, dan tetapan diselaraskan secara automatik untuk semua peranti.</p>
                         <div class="flex items-center gap-3">
                             <button onclick="openFirebaseConfigModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition">
-                                Tetapkan Firebase URL
+                                Tetapan URL Database
                             </button>
-                            <span id="adminDbStatusTag" class="text-xs font-bold text-gray-600">Mod: Local Storage</span>
+                            <span id="adminDbStatusTag" class="text-xs font-bold text-emerald-600 flex items-center gap-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Firebase Realtime Active
+                            </span>
                         </div>
                     </div>
 
@@ -544,8 +547,8 @@
             </div>
 
             <div class="mt-6 flex justify-end space-x-2">
-                <button onclick="resetToLocalDemoMode()" class="px-3.5 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-300 transition">
-                    Guna Mod Lokal
+                <button onclick="closeFirebaseConfigModal()" class="px-3.5 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-300 transition">
+                    Tutup
                 </button>
                 <button onclick="saveFirebaseCustomConfig()" class="px-4 py-2 bg-shopee text-white rounded-xl font-bold text-xs hover:bg-shopee-hover transition shadow">
                     Simpan Sambungan
@@ -649,9 +652,8 @@
         let isFirebaseConnected = false;
         let dbRef = null;
 
-        // TAMPAL DATABASE URL FIREBASE ANDA DI DALAM PEMBOLEHUBAH INI (Dalam pembuka & penutup pembuka kata "")
-        // Contoh: const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.firebasedatabase.app/";
-        const DEFAULT_FIREBASE_URL = "";
+        // URL FIREBASE REALTIME DATABASE UTAMA SK ALMA JAYA
+        const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
         // Initialize App & Firebase Setup
         function initApp() {
@@ -670,12 +672,14 @@
                 try {
                     fbConfig = JSON.parse(savedFirebaseConfig);
                 } catch(e) { console.error(e); }
-            } else if (DEFAULT_FIREBASE_URL && DEFAULT_FIREBASE_URL.startsWith('http')) {
+            }
+            
+            if (!fbConfig || !fbConfig.databaseURL) {
                 fbConfig = { databaseURL: DEFAULT_FIREBASE_URL };
             }
 
-            // Attempt Firebase Connection if config exists
-            if (fbConfig && fbConfig.databaseURL && typeof firebase !== 'undefined') {
+            // Always initialize Firebase Realtime Database
+            if (typeof firebase !== 'undefined' && fbConfig.databaseURL) {
                 try {
                     if (!firebase.apps.length) {
                         firebase.initializeApp(fbConfig);
@@ -684,7 +688,7 @@
                     isFirebaseConnected = true;
                     setupFirebaseLiveListeners();
                 } catch (err) {
-                    console.warn("Firebase config error, falling back to Local Mode:", err);
+                    console.error("Firebase connection error:", err);
                     initLocalStateFallback();
                 }
             } else {
@@ -696,7 +700,7 @@
             updateTotalOrdersCountBadge();
         }
 
-        // Local State Fallback (Storage Mode)
+        // Local State Fallback (If Network Disconnected)
         function initLocalStateFallback() {
             isFirebaseConnected = false;
 
@@ -720,7 +724,7 @@
         function setupFirebaseLiveListeners() {
             if (!dbRef) return;
 
-            // 1. Stock Listener
+            // 1. Stock & Products Listener
             dbRef.ref('skaj_bouquet/products').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -738,10 +742,23 @@
             // 2. Admin PIN Listener
             dbRef.ref('skaj_bouquet/admin_pin').on('value', (snapshot) => {
                 const val = snapshot.val();
-                if (val) adminPin = val;
+                if (val) {
+                    adminPin = String(val);
+                    localStorage.setItem('skaj_admin_pin', adminPin);
+                }
             });
 
-            // 3. Orders Listener
+            // 3. Seller WhatsApp Number Listener
+            dbRef.ref('skaj_bouquet/wa_number').on('value', (snapshot) => {
+                const val = snapshot.val();
+                if (val) {
+                    whatsappNumber = String(val);
+                    localStorage.setItem('skaj_wa_number', whatsappNumber);
+                    updateFooterInfo();
+                }
+            });
+
+            // 4. Orders Listener
             dbRef.ref('skaj_bouquet/orders').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
@@ -1148,7 +1165,7 @@
             document.getElementById('adminPinScreen').classList.add('hidden');
             document.getElementById('adminDashboardScreen').classList.remove('hidden');
             document.getElementById('adminWaInput').value = whatsappNumber;
-            document.getElementById('adminDbStatusTag').innerText = isFirebaseConnected ? "Mod: Firebase Database (Active)" : "Mod: Local Storage";
+            document.getElementById('adminDbStatusTag').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Firebase Realtime Active`;
             renderAdminStockControl();
             renderAdminOrdersList();
         }
@@ -1395,6 +1412,9 @@
             if (newWa) {
                 whatsappNumber = newWa.replace(/\D/g, '');
                 localStorage.setItem('skaj_wa_number', whatsappNumber);
+                if (isFirebaseConnected && dbRef) {
+                    dbRef.ref('skaj_bouquet/wa_number').set(whatsappNumber);
+                }
                 updateFooterInfo();
             }
 
@@ -1407,7 +1427,7 @@
                 document.getElementById('adminNewPinInput').value = '';
             }
 
-            showToast("Tetapan Admin Disimpan!", "success");
+            showToast("Tetapan Admin Disimpan ke Firebase!", "success");
         }
 
         // ================= FIREBASE CONFIG MODAL HANDLERS ================= //
@@ -1417,10 +1437,12 @@
             if (savedConfig) {
                 try {
                     const parsed = JSON.parse(savedConfig);
-                    document.getElementById('cfgDatabaseURL').value = parsed.databaseURL || '';
+                    document.getElementById('cfgDatabaseURL').value = parsed.databaseURL || DEFAULT_FIREBASE_URL;
                     document.getElementById('cfgApiKey').value = parsed.apiKey || '';
                     document.getElementById('cfgProjectId').value = parsed.projectId || '';
                 } catch(e) {}
+            } else {
+                document.getElementById('cfgDatabaseURL').value = DEFAULT_FIREBASE_URL;
             }
             document.getElementById('firebaseConfigModal').classList.remove('hidden');
         }
@@ -1447,7 +1469,7 @@
 
             localStorage.setItem('skaj_firebase_config', JSON.stringify(configObj));
             closeFirebaseConfigModal();
-            showToast("Konfigurasi Firebase disimpan! Memuat semula...", "success");
+            showToast("Sambungan Firebase dikemaskini! Memuat semula...", "success");
             
             setTimeout(() => {
                 window.location.reload();
