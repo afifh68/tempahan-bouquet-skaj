@@ -403,7 +403,7 @@
                 <p class="text-xs text-gray-500">Sila masukkan kata laluan keselamatan admin.</p>
                 
                 <div class="pt-2">
-                    <input type="password" id="adminPinInput" maxlength="10" placeholder="••••" class="w-full text-center text-2xl tracking-widest font-bold py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-shopee focus:outline-none mb-3">
+                    <input type="password" id="adminPinInput" maxlength="10" placeholder="••••" onkeydown="if(event.key==='Enter') verifyAdminPin()" class="w-full text-center text-2xl tracking-widest font-bold py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-shopee focus:outline-none mb-3">
                     <p id="adminPinError" class="text-xs text-red-500 font-semibold hidden">Kata laluan tidak sah! Sila cuba lagi.</p>
                 </div>
                 <button onclick="verifyAdminPin()" class="w-full bg-shopee hover:bg-shopee-hover text-white font-bold py-3 rounded-xl transition shadow">
@@ -559,7 +559,7 @@
         <span id="toastIcon" class="text-lg">✅</span>
         <span id="toastMessage" class="text-xs font-bold">Mesej Notifikasi</span>
     </div>
-const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.firebasedatabase.app/";
+
     <!-- Custom Confirm Dialog -->
     <div id="customDialogModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center space-y-4">
@@ -821,7 +821,7 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
                         
                         <!-- Image Container -->
                         <div class="relative aspect-square overflow-hidden bg-gray-100">
-                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x600/ffeee6/ee4d2d?text=SK+Alma+Jaya'">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='https://placehold.co/600x600/ffeee6/ee4d2d?text=SK+Alma+Jaya'">
                             <span class="absolute top-3 left-3 bg-shopee text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md uppercase tracking-wider">
                                 ${p.badge}
                             </span>
@@ -921,7 +921,7 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
 
             const previewBox = document.getElementById('modalSelectedProductPreview');
             previewBox.innerHTML = `
-                <img src="${selectedProductForCheckout.image}" class="w-14 h-14 rounded-lg object-cover border border-orange-200" onerror="this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
+                <img src="${selectedProductForCheckout.image}" class="w-14 h-14 rounded-lg object-cover border border-orange-200" onerror="this.onerror=null; this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
                 <div class="flex-1 min-w-0">
                     <span class="text-[10px] font-bold text-shopee uppercase">${selectedProductForCheckout.code}</span>
                     <h5 class="font-bold text-xs text-gray-900 truncate">${selectedProductForCheckout.name}</h5>
@@ -929,17 +929,35 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
                 </div>
             `;
 
-            document.getElementById('formAvailableStock').innerText = selectedProductForCheckout.stock;
-            
-            let currentQty = parseInt(document.getElementById('formQty').value) || 1;
-            if (currentQty > selectedProductForCheckout.stock) {
-                document.getElementById('formQty').value = selectedProductForCheckout.stock;
+            const stockEl = document.getElementById('formAvailableStock');
+            stockEl.innerText = selectedProductForCheckout.stock;
+
+            const submitBtn = document.getElementById('btnSubmitOrder');
+            const qtyInput = document.getElementById('formQty');
+
+            if (selectedProductForCheckout.stock <= 0) {
+                qtyInput.value = 0;
+                submitBtn.disabled = true;
+                submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                let currentQty = parseInt(qtyInput.value) || 1;
+                if (currentQty < 1) currentQty = 1;
+                if (currentQty > selectedProductForCheckout.stock) {
+                    currentQty = selectedProductForCheckout.stock;
+                }
+                qtyInput.value = currentQty;
             }
             calculateFormTotal();
         }
 
         function adjustQty(delta) {
             if (!selectedProductForCheckout) return;
+            if (selectedProductForCheckout.stock <= 0) {
+                showToast("⚠️ Bouquet ini telah habis stok!", "error");
+                return;
+            }
             const qtyInput = document.getElementById('formQty');
             let current = parseInt(qtyInput.value) || 1;
             let next = current + delta;
@@ -1007,17 +1025,19 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
                 const productStockRef = dbRef.ref(`skaj_bouquet/products/${pIndex}/stock`);
                 
                 productStockRef.transaction((currentStock) => {
-                    if (currentStock !== null && currentStock >= qty) {
-                        return currentStock - qty;
-                    } else {
-                        return;
+                    if (currentStock === null) {
+                        return currentStock;
                     }
+                    if (typeof currentStock === 'number' && currentStock >= qty) {
+                        return currentStock - qty;
+                    }
+                    return; // Abort transaction if insufficient stock
                 }, (error, committed) => {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = `<span>Hantar Tempahan Ke WhatsApp Peniaga</span>`;
 
                     if (error || !committed) {
-                        showToast("⚠️ Tempahan gagal! Baki stok telah habis.", "error");
+                        showToast("⚠️ Tempahan gagal! Baki stok telah habis atau tidak mencukupi.", "error");
                     } else {
                         dbRef.ref('skaj_bouquet/orders/' + orderId).set(newOrder);
                         closeCheckoutModal();
@@ -1195,6 +1215,15 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
                             Tukar Gambar
                         </button>
                     </div>
+
+                    <!-- Product Name Edit Input -->
+                    <div class="pt-2 border-t border-gray-100 flex flex-col sm:flex-row gap-2 items-center">
+                        <label class="text-[11px] font-bold text-gray-600 shrink-0">Nama Produk (${p.code}):</label>
+                        <input type="text" id="inputName_${index}" value="${escapeHtml(p.name)}" placeholder="Masukkan nama bouquet baharu..." class="w-full bg-gray-50 border border-gray-300 rounded-lg px-3 py-1 text-xs focus:ring-2 focus:ring-shopee focus:outline-none">
+                        <button onclick="saveNameFromInput(${index})" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-3 py-1 rounded-lg transition shrink-0">
+                            Tukar Nama
+                        </button>
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -1217,6 +1246,26 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
                 renderProducts();
                 renderAdminStockControl();
                 showToast(`Gambar ${products[index].code} berjaya ditukar!`, "success");
+            }
+        }
+
+        function saveNameFromInput(index) {
+            const newName = document.getElementById(`inputName_${index}`).value.trim();
+            if (!newName) {
+                showToast("Sila masukkan nama produk yang sah!", "warning");
+                return;
+            }
+
+            products[index].name = newName;
+
+            if (isFirebaseConnected && dbRef) {
+                dbRef.ref(`skaj_bouquet/products/${index}/name`).set(newName);
+                showToast(`Nama ${products[index].code} berjaya ditukar!`, "success");
+            } else {
+                saveProductsToLocalStorage();
+                renderProducts();
+                renderAdminStockControl();
+                showToast(`Nama ${products[index].code} berjaya ditukar!`, "success");
             }
         }
 
@@ -1351,10 +1400,9 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
 
             if (newPin) {
                 adminPin = newPin;
+                localStorage.setItem('skaj_admin_pin', adminPin);
                 if (isFirebaseConnected && dbRef) {
                     dbRef.ref('skaj_bouquet/admin_pin').set(adminPin);
-                } else {
-                    localStorage.setItem('skaj_admin_pin', adminPin);
                 }
                 document.getElementById('adminNewPinInput').value = '';
             }
@@ -1495,8 +1543,8 @@ const DEFAULT_FIREBASE_URL = "https://skaj-bouquet-default-rtdb.asia-southeast1.
         }
 
         function escapeHtml(text) {
-            if (!text) return '';
-            return text
+            if (text === null || text === undefined) return '';
+            return String(text)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
