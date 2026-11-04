@@ -639,8 +639,8 @@
             }
         ];
 
-        // Global Application State Variables
-        let products = [];
+        // Global Application State Variables - Pre-populated to prevent blank initial render
+        let products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
         let orders = [];
         let whatsappNumber = '60195218697';
         let adminPin = '6897';
@@ -657,12 +657,29 @@
 
         // Initialize App & Firebase Setup
         function initApp() {
+            // 1. Pre-load local cached products if available
+            const savedProducts = localStorage.getItem('skaj_products_v1');
+            if (savedProducts) {
+                try { 
+                    const parsed = JSON.parse(savedProducts);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        products = parsed;
+                    }
+                } catch (e) { 
+                    products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)); 
+                }
+            }
+
             // Load saved seller settings
             const savedWa = localStorage.getItem('skaj_wa_number');
             if (savedWa) whatsappNumber = savedWa;
 
             const savedPin = localStorage.getItem('skaj_admin_pin');
             if (savedPin) adminPin = savedPin;
+
+            // Render products immediately so screen is NEVER empty on any device
+            updateFooterInfo();
+            renderProducts();
 
             // Check for saved Firebase config in localStorage or fallback to default URL
             const savedFirebaseConfig = localStorage.getItem('skaj_firebase_config');
@@ -695,24 +712,12 @@
                 initLocalStateFallback();
             }
 
-            updateFooterInfo();
-            renderProducts();
             updateTotalOrdersCountBadge();
         }
 
         // Local State Fallback (If Network Disconnected)
         function initLocalStateFallback() {
             isFirebaseConnected = false;
-
-            const savedProducts = localStorage.getItem('skaj_products_v1');
-            if (savedProducts) {
-                try { products = JSON.parse(savedProducts); }
-                catch (e) { products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)); }
-            } else {
-                products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
-                saveProductsToLocalStorage();
-            }
-
             const savedOrders = localStorage.getItem('skaj_orders_v1');
             if (savedOrders) {
                 try { orders = JSON.parse(savedOrders); } catch (e) { orders = []; }
@@ -729,14 +734,20 @@
                 const data = snapshot.val();
                 if (data) {
                     products = Array.isArray(data) ? data : Object.values(data);
+                    saveProductsToLocalStorage();
                 } else {
                     dbRef.ref('skaj_bouquet/products').set(DEFAULT_PRODUCTS);
                     products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                    saveProductsToLocalStorage();
                 }
                 renderProducts();
                 if (document.getElementById('adminTabStock') && !document.getElementById('adminTabStock').classList.contains('hidden')) {
                     renderAdminStockControl();
                 }
+            }, (error) => {
+                console.error("Firebase Products Read Error:", error);
+                // Maintain current products render if Firebase permissions fail
+                renderProducts();
             });
 
             // 2. Admin PIN Listener
@@ -746,7 +757,7 @@
                     adminPin = String(val);
                     localStorage.setItem('skaj_admin_pin', adminPin);
                 }
-            });
+            }, (error) => console.error("Firebase PIN Read Error:", error));
 
             // 3. Seller WhatsApp Number Listener
             dbRef.ref('skaj_bouquet/wa_number').on('value', (snapshot) => {
@@ -756,7 +767,7 @@
                     localStorage.setItem('skaj_wa_number', whatsappNumber);
                     updateFooterInfo();
                 }
-            });
+            }, (error) => console.error("Firebase WA Read Error:", error));
 
             // 4. Orders Listener
             dbRef.ref('skaj_bouquet/orders').on('value', (snapshot) => {
@@ -766,11 +777,12 @@
                 } else {
                     orders = [];
                 }
+                saveOrdersToLocalStorage();
                 updateTotalOrdersCountBadge();
                 if (document.getElementById('adminTabOrders') && !document.getElementById('adminTabOrders').classList.contains('hidden')) {
                     renderAdminOrdersList();
                 }
-            });
+            }, (error) => console.error("Firebase Orders Read Error:", error));
         }
 
         // Local Storage Helpers
