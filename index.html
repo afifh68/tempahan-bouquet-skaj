@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jualan Bouquet Graduasi SK Alma Jaya</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        shopee: {
+                            DEFAULT: '#EE4D2D',
+                            hover: '#d73d1e',
+                            light: '#FFF5F1',
+                            dark: '#c83416'
+                        },
+                        skaj: {
+                            red: '#D9232A',
+                            yellow: '#FACC15',
+                            blue: '#0EA5E9',
+                            darkBlue: '#1E3A8A'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDK Compat Libraries (v10) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col antialiased">
+
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-skaj-red via-shopee to-amber-500 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium shadow-sm flex justify-between items-center max-w-7xl mx-auto w-full">
+        <span class="truncate flex items-center gap-1.5">
+            🎓 <strong>SEKOLAH KEBANGSAAN ALMA JAYA:</strong> Jualan Bouquet Sempena Hari Apresiasi &amp; Graduan Tahun 6
+        </span>
+        <div class="flex items-center space-x-2 shrink-0">
+            <button onclick="openAdminModal()" class="bg-white/90 hover:bg-white text-gray-900 text-xs font-bold px-3 py-1 rounded-full shadow transition flex items-center gap-1">
+                <svg class="w-3.5 h-3.5 text-shopee" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                <span>Portal Admin</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Header / Navbar -->
+    <header class="sticky top-0 z-30 bg-white shadow-sm border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4 flex items-center justify-between gap-4">
+            
+            <!-- School Logo & Branding -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                <!-- SK Alma Jaya Official Crest SVG (Updated Exact Design) -->
+                <div class="w-12 h-12 shrink-0 flex items-center justify-center">
+                    <svg class="w-12 h-12" viewBox="0 0 240 250" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <!-- Arc path for curved top text -->
+                            <path id="skajTextPath" d="M 32,115 A 88,88 0 1,1 208,115" />
+                        </defs>
+                        
+                        <!-- Outer Black Border & Red Circular Shield -->
+                        <circle cx="120" cy="115" r="102" fill="#1E1E1E"/>
+                        <circle cx="120" cy="115" r="98" fill="#E52329"/>
+                        
+                        <!-- Inner Circle Background (Yellow top / Blue bottom split) -->
+                        <g clip-path="url(#innerCircleClip)">
+                            <clipPath id="innerCircleClip">
+                                <circle cx="120" cy="115" r="70" />
+                            </clipPath>
+                            <rect x="50" y="45" width="140" height="140" fill="#38BDF8"/>
+                            <path d="M 40,45 L 200,45 L 200,100 L 40,140 Z" fill="#FFDC00"/>
+                        </g>
+                        <circle cx="120" cy="115" r="70" stroke="#1E1E1E" stroke-width="4" fill="none"/>
+
+                        <!-- Curved Text: SEKOLAH KEBANGSAAN ALMA JAYA -->
+                        <text fill="#000000" font-family="Inter, Arial, sans-serif" font-weight="900" font-size="13.5" letter-spacing="0.5">
+                            <textPath href="#skajTextPath" startOffset="50%" text-anchor="middle">
+                                SEKOLAH KEBANGSAAN ALMA JAYA
+                            </textPath>
+                        </text>
+
+                        <!-- Paddy Stalks (Golden Grains) inside Red Ring -->
+                        <g stroke="#1E1E1E" stroke-width="1.5" fill="#FFC72C">
+                            <!-- Left Paddy -->
+                            <path d="M 50,165 Q 75,175 105,175" stroke="#1E1E1E" stroke-width="2" fill="none"/>
+                            <ellipse cx="60" cy="160" rx="6" ry="3" transform="rotate(-30 60 160)" />
+                            <ellipse cx="70" cy="165" rx="6" ry="3" transform="rotate(-20 70 165)" />
+                            <ellipse cx="80" cy="170" rx="6" ry="3" transform="rotate(-10 80 170)" />
+                            <ellipse cx="90" cy="172" rx="6" ry="3" transform="rotate(0 90 172)" />
+                            <ellipse cx="100" cy="173" rx="6" ry="3" transform="rotate(10 100 173)" />
+                            
+                            <!-- Right Paddy -->
+                            <path d="M 190,165 Q 165,175 135,175" stroke="#1E1E1E" stroke-width="2" fill="none"/>
+                            <ellipse cx="180" cy="160" rx="6" ry="3" transform="rotate(30 180 160)" />
+                            <ellipse cx="170" cy="165" rx="6" ry="3" transform="rotate(20 170 165)" />
+                            <ellipse cx="160" cy="170" rx="6" ry="3" transform="rotate(10 160 170)" />
+                            <ellipse cx="150" cy="172" rx="6" ry="3" transform="rotate(0 150 172)" />
+                            <ellipse cx="140" cy="173" rx="6" ry="3" transform="rotate(-10 140 173)" />
+                        </g>
+
+                        <!-- Torch & Flame at Top of Book -->
+                        <path d="M 115,50 Q 120,35 125,50 Q 118,60 115,50 Z" fill="#E52329" stroke="#1E1E1E" stroke-width="1.5"/>
+                        <path d="M 120,38 Q 123,45 120,53 Q 117,45 120,38 Z" fill="#FFFFFF"/>
+                        
+                        <!-- Open Book -->
+                        <g stroke="#1E1E1E" stroke-width="3" fill="#FFFFFF">
+                            <path d="M 70,82 Q 120,95 120,132 Q 120,95 170,82 L 170,120 Q 120,135 120,152 Q 120,135 70,120 Z" />
+                        </g>
+                        <!-- Center Red Torch Body inside Book -->
+                        <path d="M 117,72 L 123,72 L 123,148 L 117,148 Z" fill="#E52329" stroke="#1E1E1E" stroke-width="1.5"/>
+                        
+                        <!-- Book Page Detail Lines & Letters -->
+                        <path d="M 85,92 Q 102,97 110,97 M 85,102 Q 102,107 110,107 M 85,112 Q 102,117 110,117" stroke="#1E1E1E" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M 130,97 Q 138,97 155,92 M 130,107 Q 138,107 155,102 M 130,117 Q 138,117 155,112" stroke="#1E1E1E" stroke-width="1.5" stroke-linecap="round"/>
+                        
+                        <!-- Letters SK AJ -->
+                        <text x="92" y="105" font-family="Inter, sans-serif" font-weight="900" font-size="16" fill="#1E1E1E" text-anchor="middle">S K</text>
+                        <text x="148" y="105" font-family="Inter, sans-serif" font-weight="900" font-size="16" fill="#1E1E1E" text-anchor="middle">A J</text>
+
+                        <!-- 3 Interlocking Rings below Book -->
+                        <g stroke="#1E1E1E" stroke-width="2.5" fill="none">
+                            <circle cx="102" cy="142" r="11" stroke="#0055A5"/>
+                            <circle cx="120" cy="142" r="11" stroke="#0055A5"/>
+                            <circle cx="138" cy="142" r="11" stroke="#0055A5"/>
+                        </g>
+
+                        <!-- Bottom Ribbon (Sky Blue) -->
+                        <g stroke="#1E1E1E" stroke-width="2">
+                            <path d="M 20,200 L 70,185 L 70,215 L 20,225 Z" fill="#00A3E0"/>
+                            <path d="M 220,200 L 170,185 L 170,215 L 220,225 Z" fill="#00A3E0"/>
+                            <path d="M 25,195 L 215,195 L 205,230 L 35,230 Z" fill="#00A3E0"/>
+                            <path d="M 82,195 L 82,230 M 158,195 L 158,230" stroke="#1E1E1E" stroke-width="2"/>
+                        </g>
+                        
+                        <!-- Ribbon Text: BERILMU BERBUDI BERBAKTI -->
+                        <text x="54" y="217" font-family="Inter, sans-serif" font-weight="900" font-size="9" fill="#000000" text-anchor="middle">BERILMU</text>
+                        <text x="120" y="217" font-family="Inter, sans-serif" font-weight="900" font-size="9" fill="#000000" text-anchor="middle">BERBUDI</text>
+                        <text x="186" y="217" font-family="Inter, sans-serif" font-weight="900" font-size="9" fill="#000000" text-anchor="middle">BERBAKTI</text>
+                    </svg>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-xl font-black tracking-tight text-gray-900 leading-tight">
+                        SK ALMA JAYA
+                    </h1>
+                    <p class="text-xs text-shopee font-bold tracking-wide">Tempahan Bouquet Graduasi Rasmi</p>
+                </div>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="hidden md:flex flex-1 max-w-md mx-6">
+                <div class="relative w-full">
+                    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="Cari reka bentuk bouquet..." class="w-full bg-gray-100 text-sm pl-4 pr-10 py-2.5 rounded-full border border-transparent focus:border-shopee focus:bg-white focus:outline-none transition-all">
+                    <button class="absolute right-1 top-1 bottom-1 bg-shopee text-white px-4 rounded-full flex items-center justify-center hover:bg-shopee-hover transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Customer Orders Tracker -->
+            <div class="flex items-center space-x-3">
+                <button onclick="openCustomerOrdersModal()" class="flex items-center text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 px-3.5 py-2 rounded-xl transition">
+                    <svg class="w-4 h-4 mr-1.5 text-shopee" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    <span>Pesanan Saya</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Banner Hero Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 sm:mt-6">
+        <div class="relative rounded-2xl overflow-hidden bg-gradient-to-r from-red-700 via-shopee to-amber-500 text-white p-6 sm:p-10 shadow-md">
+            <div class="absolute -right-10 -bottom-10 opacity-10 text-[180px] font-black select-none pointer-events-none">🎓</div>
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-block bg-white/20 backdrop-blur-md text-white text-xs font-extrabold px-3 py-1 rounded-full mb-3 uppercase tracking-wider">
+                    Hari Apresiasi &amp; Graduasi Pelajar SK Alma Jaya
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-extrabold leading-tight mb-3">
+                    Raikan Kejayaan Anak-Anak Dengan Bouquet Eksklusif!
+                </h2>
+                <p class="text-white/95 text-sm sm:text-base mb-6 font-light leading-relaxed">
+                    Pilih daripada 5 reka bentuk bouquet khas untuk diserahkan semasa majlis graduasi. Isikan maklumat tempahan dan makluman akan dihantar secara terus ke WhatsApp peniaga.
+                </p>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="scrollToProducts()" class="bg-white text-shopee font-extrabold text-sm px-6 py-3 rounded-xl shadow-md hover:bg-orange-50 transition transform active:scale-95">
+                        Lihat Reka Bentuk Bouquet
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Products Section -->
+    <main id="productsSection" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-8 flex-1">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 pb-3 border-b border-gray-200 gap-4">
+            <div>
+                <h3 class="text-xl sm:text-2xl font-black text-gray-900 flex items-center">
+                    <span class="w-3 h-7 bg-shopee rounded-full inline-block mr-3"></span>
+                    Katalog Bouquet Graduasi
+                </h3>
+                <p class="text-xs sm:text-sm text-gray-500 mt-1">Setiap reka bentuk diperuntukkan 30 unit sahaja. Sila buat tempahan awal untuk menjamin ketersediaan.</p>
+            </div>
+            
+            <!-- Quick Filter Tabs -->
+            <div class="flex items-center space-x-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-btn active text-xs px-3.5 py-1.5 rounded-full font-semibold bg-shopee text-white shadow-sm transition shrink-0">Semua Design (5)</button>
+                <button onclick="setFilter('available')" id="filter-available" class="filter-btn text-xs px-3.5 py-1.5 rounded-full font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 transition shrink-0">Ada Stok</button>
+                <button onclick="setFilter('low')" id="filter-low" class="filter-btn text-xs px-3.5 py-1.5 rounded-full font-semibold bg-white text-gray-600 border border-gray-200 hover:bg-gray-100 transition shrink-0">Stok Berkurang (&lt;10)</button>
+            </div>
+        </div>
+
+        <!-- Product Cards Grid -->
+        <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Dynamic JS injected product cards -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 text-xs py-10 mt-auto border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h4 class="text-white font-bold text-base mb-3 flex items-center justify-center sm:justify-start gap-2">
+                    🎓 SK Alma Jaya Bouquet Store
+                </h4>
+                <p class="leading-relaxed">Sistem Tempahan Bouquet Graduasi Rasmi Sekolah Kebangsaan Alma Jaya.</p>
+            </div>
+            <div class="text-center">
+                <h5 class="text-white font-semibold mb-3">Pautan Pantas</h5>
+                <ul class="space-y-2">
+                    <li><a href="#productsSection" class="hover:text-shopee transition">Katalog Bouquet</a></li>
+                    <li><button onclick="openCustomerOrdersModal()" class="hover:text-shopee transition">Semak Pesanan Saya</button></li>
+                    <li><button onclick="openAdminModal()" class="hover:text-shopee transition">Portal Admin</button></li>
+                </ul>
+            </div>
+            <div class="text-center sm:text-right">
+                <h5 class="text-white font-semibold mb-3">Hubungi Peniaga</h5>
+                <p class="mb-2">WhatsApp Peniaga &amp; Pengesahan Tempahan:</p>
+                <a id="footerWaLink" href="#" target="_blank" class="inline-flex items-center text-emerald-400 font-bold hover:underline">
+                    <svg class="w-4 h-4 mr-1.5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                    <span id="footerWaNumber">60195218697</span>
+                </a>
+                <p class="mt-4 text-gray-500">&copy; 2026 SK Alma Jaya. Hak Cipta Terpelihara.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL 1: Customer Order Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden my-8 transform transition-all border border-gray-100 flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="bg-shopee px-6 py-4 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                    <h3 class="font-bold text-lg">Borang Tempahan Bouquet</h3>
+                </div>
+                <button onclick="closeCheckoutModal()" class="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- Modal Content Form -->
+            <form id="orderForm" onsubmit="handleOrderSubmit(event)" class="p-6 overflow-y-auto space-y-4 custom-scrollbar flex-1">
+                
+                <!-- Selected Bouquet Preview Card -->
+                <div id="modalSelectedProductPreview" class="bg-orange-50 border border-orange-200 p-3.5 rounded-xl flex items-center space-x-3">
+                    <!-- Dynamic preview -->
+                </div>
+
+                <!-- Product Selection Dropdown -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Pilih Design Bouquet *</label>
+                    <select id="formProductSelect" onchange="updateFormProductSelection()" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-gray-800 focus:outline-none focus:ring-2 focus:ring-shopee">
+                        <!-- Options generated by JS -->
+                    </select>
+                </div>
+
+                <!-- Quantity Selector -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Kuantiti *</label>
+                    <div class="flex items-center space-x-3">
+                        <div class="flex items-center border border-gray-300 rounded-xl overflow-hidden bg-gray-50">
+                            <button type="button" onclick="adjustQty(-1)" class="px-3.5 py-2 bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition text-base">-</button>
+                            <input type="number" id="formQty" value="1" min="1" readonly class="w-14 text-center font-bold text-gray-800 bg-transparent text-sm focus:outline-none">
+                            <button type="button" onclick="adjustQty(1)" class="px-3.5 py-2 bg-gray-200 text-gray-700 font-bold hover:bg-gray-300 transition text-base">+</button>
+                        </div>
+                        <span class="text-xs font-semibold text-gray-500">
+                            (Baki stok: <span id="formAvailableStock" class="font-bold text-shopee">0</span> pcs)
+                        </span>
+                    </div>
+                </div>
+
+                <div class="border-t border-gray-100 pt-3"></div>
+
+                <!-- Customer Details -->
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nama Anak / Graduan *</label>
+                    <input type="text" id="formStudentName" required placeholder="Cth: Muhammad Adam Bin Rosli" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-shopee">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Kelas Pelajar (Pilihan)</label>
+                    <input type="text" id="formClassName" placeholder="Cth: 6 Alma / 6 Jaya" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-shopee">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Nombor Telefon / WhatsApp Ibu Bapa *</label>
+                    <input type="tel" id="formPhone" required placeholder="Cth: 0195218697" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-shopee">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Kad Ucapan (Pilihan)</label>
+                    <textarea id="formMessage" rows="2" placeholder="Tuliskan ucapan tahniah untuk diletakkan pada bouquet..." class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-shopee"></textarea>
+                </div>
+
+                <!-- Total Summary Box -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs text-gray-500 block font-medium">Jumlah Bayaran</span>
+                        <span class="text-xs text-emerald-600 font-semibold flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Stok Disahkan
+                        </span>
+                    </div>
+                    <div class="text-right">
+                        <span id="formTotalPrice" class="text-xl font-black text-shopee">RM 0.00</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="btnSubmitOrder" class="w-full bg-shopee hover:bg-shopee-hover text-white font-bold py-3.5 px-4 rounded-xl shadow-lg hover:shadow-xl transition transform active:scale-[0.99] flex items-center justify-center space-x-2 text-sm sm:text-base">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    <span>Hantar Tempahan Ke WhatsApp Peniaga</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Order Success & WhatsApp Direct Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 text-center transform transition-all border border-gray-100">
+            <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900 mb-1">Tempahan Berjaya Direkodkan!</h3>
+            <p class="text-xs text-gray-500 mb-4">Sila hantar butiran ini ke WhatsApp peniaga untuk pengesahan dan pembayaran.</p>
+            
+            <div id="successReceiptBox" class="bg-gray-50 p-4 rounded-xl text-left border border-gray-200 text-xs space-y-2 mb-6">
+                <!-- Receipt details populated by JS -->
+            </div>
+
+            <div class="space-y-3">
+                <a id="btnSendWhatsApp" href="#" target="_blank" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 px-4 rounded-xl shadow-md flex items-center justify-center space-x-2 transition">
+                    <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z"/></svg>
+                    <span>Terus Ke WhatsApp Peniaga</span>
+                </a>
+                <button onclick="closeSuccessModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 px-4 rounded-xl text-xs transition">
+                    Tutup &amp; Kembali
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: Admin Control Panel (PIN Protected: 6897) -->
+    <div id="adminModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white w-full max-w-4xl rounded-2xl shadow-2xl overflow-hidden my-6 border border-gray-100 flex flex-col max-h-[90vh]">
+            
+            <!-- Admin Top Header -->
+            <div class="bg-gray-900 px-6 py-4 text-white flex items-center justify-between shrink-0">
+                <div class="flex items-center space-x-2">
+                    <span class="p-1.5 bg-shopee text-white rounded-lg text-xs font-black">ADMIN</span>
+                    <h3 class="font-bold text-base sm:text-lg">Panel Pengurusan SK Alma Jaya</h3>
+                </div>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-800 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- PIN Auth Screen -->
+            <div id="adminPinScreen" class="p-8 text-center max-w-sm mx-auto my-auto space-y-4">
+                <div class="w-14 h-14 bg-orange-100 text-shopee rounded-full flex items-center justify-center mx-auto mb-2">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h4 class="text-xl font-black text-gray-900">Log Masuk Admin</h4>
+                <p class="text-xs text-gray-500">Sila masukkan kata laluan keselamatan admin.</p>
+                
+                <div class="pt-2">
+                    <input type="password" id="adminPinInput" maxlength="10" placeholder="••••" class="w-full text-center text-2xl tracking-widest font-bold py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-shopee focus:outline-none mb-3">
+                    <p id="adminPinError" class="text-xs text-red-500 font-semibold hidden">Kata laluan tidak sah! Sila cuba lagi.</p>
+                </div>
+                <button onclick="verifyAdminPin()" class="w-full bg-shopee hover:bg-shopee-hover text-white font-bold py-3 rounded-xl transition shadow">
+                    Masuk Panel Admin
+                </button>
+            </div>
+
+            <!-- Dashboard Screen (After Authorized) -->
+            <div id="adminDashboardScreen" class="hidden flex-1 flex flex-col overflow-hidden">
+                
+                <!-- Admin Tabs -->
+                <div class="bg-gray-100 px-6 py-2 border-b border-gray-200 flex space-x-2 overflow-x-auto shrink-0">
+                    <button onclick="switchAdminTab('stock')" id="tabBtnStock" class="admin-tab active bg-white text-shopee font-bold text-xs px-4 py-2 rounded-lg shadow-sm transition">
+                        📦 Pengurusan Stok
+                    </button>
+                    <button onclick="switchAdminTab('orders')" id="tabBtnOrders" class="admin-tab bg-transparent text-gray-600 hover:bg-gray-200 font-bold text-xs px-4 py-2 rounded-lg transition">
+                        📜 Senarai Tempahan (<span id="adminOrderCount">0</span>)
+                    </button>
+                    <button onclick="switchAdminTab('settings')" id="tabBtnSettings" class="admin-tab bg-transparent text-gray-600 hover:bg-gray-200 font-bold text-xs px-4 py-2 rounded-lg transition">
+                        ⚙️ Tetapan Peniaga &amp; Mod Demo
+                    </button>
+                </div>
+
+                <!-- TAB 1: Stock Management -->
+                <div id="adminTabStock" class="p-6 overflow-y-auto custom-scrollbar space-y-6 flex-1">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-orange-50 border border-orange-200 p-4 rounded-xl gap-3">
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-900">Reset Keseluruhan Stok</h4>
+                            <p class="text-xs text-gray-600">Tekan butang ini untuk mengembalikan semua 5 design bouquet kepada kuantiti 30 unit.</p>
+                        </div>
+                        <button onclick="resetAllStockTo30()" class="bg-shopee hover:bg-shopee-hover text-white font-bold text-xs px-4 py-2.5 rounded-xl shadow transition shrink-0 flex items-center space-x-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <span>Reset Semua Ke 30 Pcs</span>
+                        </button>
+                    </div>
+
+                    <!-- Stock List -->
+                    <div class="space-y-4">
+                        <h4 class="font-bold text-sm text-gray-800">Senarai Baki Stok Mengikut Design:</h4>
+                        <div id="adminStockControlList" class="space-y-3">
+                            <!-- Loaded via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: Orders List -->
+                <div id="adminTabOrders" class="p-6 overflow-y-auto custom-scrollbar hidden space-y-4 flex-1">
+                    <div class="flex justify-between items-center mb-2">
+                        <h4 class="font-bold text-sm text-gray-800">Rekod Tempahan Masuk</h4>
+                        <button onclick="clearAllOrders()" class="text-xs font-semibold text-red-600 hover:text-red-800 hover:underline">
+                            Padam Semua Rekod
+                        </button>
+                    </div>
+                    <div id="adminOrdersList" class="space-y-3">
+                        <!-- Loaded via JS -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: Admin Settings & Demo Configuration -->
+                <div id="adminTabSettings" class="p-6 overflow-y-auto custom-scrollbar hidden space-y-5 flex-1 max-w-xl">
+                    <h4 class="font-bold text-sm text-gray-800">Tetapan Peniaga</h4>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Nombor WhatsApp Peniaga (Format: 601XXXXXXXX)</label>
+                        <input type="text" id="adminWaInput" value="60195218697" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2 text-sm font-semibold">
+                    </div>
+                    
+                    <div class="border-t border-gray-200 pt-4">
+                        <h4 class="font-bold text-sm text-gray-800 mb-1">Kemaskini Kata Laluan Admin</h4>
+                        <p class="text-xs text-gray-500 mb-2">Tukar kata laluan akses admin (Semasa: 6897).</p>
+                        <input type="text" id="adminNewPinInput" placeholder="Masukkan kata laluan baharu" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3.5 py-2 text-sm font-semibold">
+                    </div>
+
+                    <div class="border-t border-gray-200 pt-4">
+                        <h4 class="font-bold text-sm text-gray-800 mb-1">Mod Pangkalan Data (Akses Admin)</h4>
+                        <p class="text-xs text-gray-500 mb-2">Tetapan mod demo atau sambungan Firebase Realtime Database hanya diuruskan di sini.</p>
+                        <div class="flex items-center gap-3">
+                            <button onclick="openFirebaseConfigModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition">
+                                Tetapkan Firebase URL
+                            </button>
+                            <span id="adminDbStatusTag" class="text-xs font-bold text-gray-600">Mod: Local Storage</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-2">
+                        <button onclick="saveAdminSettings()" class="bg-gray-900 hover:bg-black text-white font-bold text-xs px-5 py-2.5 rounded-xl shadow transition">
+                            Simpan Tetapan
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: Customer Order Tracker Modal -->
+    <div id="customerOrdersModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-6 transform transition-all border border-gray-100 max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center pb-3 border-b border-gray-200">
+                <h3 class="font-bold text-base text-gray-900">Sejarah Tempahan Saya</h3>
+                <button onclick="closeCustomerOrdersModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="customerOrdersList" class="overflow-y-auto space-y-3 py-4 flex-1 custom-scrollbar">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 5: Firebase Custom Credentials Setup Modal (Admin Only) -->
+    <div id="firebaseConfigModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl p-6 border border-gray-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex justify-between items-center pb-3 border-b border-gray-200 mb-4">
+                <h3 class="font-bold text-base text-gray-900 flex items-center gap-2">
+                    🔥 Tetapan Pangkalan Data Firebase
+                </h3>
+                <button onclick="closeFirebaseConfigModal()" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            
+            <p class="text-xs text-gray-600 mb-4 leading-relaxed">
+                Masukkan URL Firebase Realtime Database anda untuk menyelaraskan stok secara automatik merentasi semua peranti.
+            </p>
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">databaseURL *</label>
+                    <input type="text" id="cfgDatabaseURL" placeholder="https://projek-anda-default-rtdb.firebaseio.com" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">apiKey (Pilihan)</label>
+                    <input type="text" id="cfgApiKey" placeholder="AIzaSy..." class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-700 mb-1">projectId (Pilihan)</label>
+                    <input type="text" id="cfgProjectId" placeholder="projek-anda-id" class="w-full bg-gray-50 border border-gray-300 rounded-xl px-3 py-2 text-xs">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-2">
+                <button onclick="resetToLocalDemoMode()" class="px-3.5 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-300 transition">
+                    Guna Mod Lokal
+                </button>
+                <button onclick="saveFirebaseCustomConfig()" class="px-4 py-2 bg-shopee text-white rounded-xl font-bold text-xs hover:bg-shopee-hover transition shadow">
+                    Simpan Sambungan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastNotification" class="fixed bottom-6 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center space-x-3 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <span id="toastIcon" class="text-lg">✅</span>
+        <span id="toastMessage" class="text-xs font-bold">Mesej Notifikasi</span>
+    </div>
+
+    <!-- Custom Confirm Dialog -->
+    <div id="customDialogModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl p-6 max-w-sm w-full text-center space-y-4">
+            <div id="dialogIcon" class="w-12 h-12 rounded-full bg-orange-100 text-shopee flex items-center justify-center mx-auto text-xl">
+                ⚠️
+            </div>
+            <h4 id="dialogTitle" class="font-bold text-base text-gray-900">Pengesahan</h4>
+            <p id="dialogText" class="text-xs text-gray-600">Adakah anda pasti?</p>
+            <div id="dialogButtons" class="flex justify-center space-x-2 pt-2">
+                <!-- Dynamic Buttons -->
+            </div>
+        </div>
+    </div>
+
+
+    <!-- JavaScript Application Core -->
+    <script>
+        // Default 5 SK Alma Jaya Graduation Bouquet Designs (30 pcs stock each)
+        const DEFAULT_PRODUCTS = [
+            {
+                id: 'design-a',
+                code: 'DESIGN A',
+                name: 'Classic Red Bear Bouquet',
+                price: 35.00,
+                stock: 30,
+                maxStock: 30,
+                badge: 'Paling Laris 🔥',
+                image: 'https://images.unsplash.com/photo-1563241527-3004b7be0ffd?auto=format&fit=crop&w=600&q=80',
+                description: 'Patung konvo comel bersama mawar merah premium & reben satin keemasan.'
+            },
+            {
+                id: 'design-b',
+                code: 'DESIGN B',
+                name: 'Sunflower Delight Bouquet',
+                price: 30.00,
+                stock: 30,
+                maxStock: 30,
+                badge: 'Ceria ✨',
+                image: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80',
+                description: 'Bunga matahari segar melambangkan kejayaan cemerlang & masa depan cerah.'
+            },
+            {
+                id: 'design-c',
+                code: 'DESIGN C',
+                name: 'Royal Blue Konvo Bear',
+                price: 40.00,
+                stock: 30,
+                maxStock: 30,
+                badge: 'Eksklusif 💙',
+                image: 'https://images.unsplash.com/photo-1526047932273-341f2a7631f9?auto=format&fit=crop&w=600&q=80',
+                description: 'Hydrangea biru diraja dengan mawar putih & patung konvo berstetoskop.'
+            },
+            {
+                id: 'design-d',
+                code: 'DESIGN D',
+                name: 'Soft Pink Graduation Sweet',
+                price: 35.00,
+                stock: 30,
+                maxStock: 30,
+                badge: 'Anggun 🌸',
+                image: 'https://images.unsplash.com/photo-1582794543139-8ac9cb0f7b11?auto=format&fit=crop&w=600&q=80',
+                description: 'Kombinasi peony merah jambu lembut bersama baby breath import eksklusif.'
+            },
+            {
+                id: 'design-e',
+                code: 'DESIGN E',
+                name: 'Executive Chocolate & Plush',
+                price: 50.00,
+                stock: 30,
+                maxStock: 30,
+                badge: 'Mewah 🧸🍫',
+                image: 'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=600&q=80',
+                description: 'Kombo mewah patung konvo beserta 8 biji coklat Ferrero Rocher lazat.'
+            }
+        ];
+
+        // Global Application State Variables
+        let products = [];
+        let orders = [];
+        let whatsappNumber = '60195218697';
+        let adminPin = '6897';
+        let isAdminLoggedIn = false;
+        let selectedProductForCheckout = null;
+        let activeFilter = 'all';
+
+        // Firebase References
+        let isFirebaseConnected = false;
+        let dbRef = null;
+
+        // Initialize App & Firebase Setup
+        function initApp() {
+            // Load saved seller settings
+            const savedWa = localStorage.getItem('skaj_wa_number');
+            if (savedWa) whatsappNumber = savedWa;
+
+            const savedPin = localStorage.getItem('skaj_admin_pin');
+            if (savedPin) adminPin = savedPin;
+
+            // Check for saved Firebase config in localStorage
+            const savedFirebaseConfig = localStorage.getItem('skaj_firebase_config');
+            let fbConfig = null;
+
+            if (savedFirebaseConfig) {
+                try {
+                    fbConfig = JSON.parse(savedFirebaseConfig);
+                } catch(e) { console.error(e); }
+            }
+
+            // Attempt Firebase Connection if config exists
+            if (fbConfig && fbConfig.databaseURL && typeof firebase !== 'undefined') {
+                try {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp(fbConfig);
+                    }
+                    dbRef = firebase.database();
+                    isFirebaseConnected = true;
+                    setupFirebaseLiveListeners();
+                } catch (err) {
+                    console.warn("Firebase config error, falling back to Local Mode:", err);
+                    initLocalStateFallback();
+                }
+            } else {
+                initLocalStateFallback();
+            }
+
+            updateFooterInfo();
+            renderProducts();
+            updateTotalOrdersCountBadge();
+        }
+
+        // Local State Fallback (Storage Mode)
+        function initLocalStateFallback() {
+            isFirebaseConnected = false;
+
+            const savedProducts = localStorage.getItem('skaj_products_v1');
+            if (savedProducts) {
+                try { products = JSON.parse(savedProducts); }
+                catch (e) { products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS)); }
+            } else {
+                products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                saveProductsToLocalStorage();
+            }
+
+            const savedOrders = localStorage.getItem('skaj_orders_v1');
+            if (savedOrders) {
+                try { orders = JSON.parse(savedOrders); } catch (e) { orders = []; }
+            }
+        }
+
+        // ================= FIREBASE REALTIME LISTENERS ================= //
+
+        function setupFirebaseLiveListeners() {
+            if (!dbRef) return;
+
+            // 1. Stock Listener
+            dbRef.ref('skaj_bouquet/products').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    products = Array.isArray(data) ? data : Object.values(data);
+                } else {
+                    dbRef.ref('skaj_bouquet/products').set(DEFAULT_PRODUCTS);
+                    products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+                }
+                renderProducts();
+                if (document.getElementById('adminTabStock') && !document.getElementById('adminTabStock').classList.contains('hidden')) {
+                    renderAdminStockControl();
+                }
+            });
+
+            // 2. Admin PIN Listener
+            dbRef.ref('skaj_bouquet/admin_pin').on('value', (snapshot) => {
+                const val = snapshot.val();
+                if (val) adminPin = val;
+            });
+
+            // 3. Orders Listener
+            dbRef.ref('skaj_bouquet/orders').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    orders = Object.values(data).reverse();
+                } else {
+                    orders = [];
+                }
+                updateTotalOrdersCountBadge();
+                if (document.getElementById('adminTabOrders') && !document.getElementById('adminTabOrders').classList.contains('hidden')) {
+                    renderAdminOrdersList();
+                }
+            });
+        }
+
+        // Local Storage Helpers
+        function saveProductsToLocalStorage() {
+            localStorage.setItem('skaj_products_v1', JSON.stringify(products));
+        }
+
+        function saveOrdersToLocalStorage() {
+            localStorage.setItem('skaj_orders_v1', JSON.stringify(orders));
+            updateTotalOrdersCountBadge();
+        }
+
+        function updateFooterInfo() {
+            document.getElementById('footerWaNumber').innerText = whatsappNumber;
+            document.getElementById('footerWaLink').href = `https://wa.me/${whatsappNumber}`;
+        }
+
+        function updateTotalOrdersCountBadge() {
+            const el = document.getElementById('adminOrderCount');
+            if (el) el.innerText = orders.length;
+        }
+
+        // Render Catalogue Grid
+        function renderProducts() {
+            const container = document.getElementById('productGrid');
+            const searchVal = (document.getElementById('searchInput').value || '').toLowerCase();
+
+            container.innerHTML = '';
+
+            let filtered = products.filter(p => {
+                const matchSearch = p.name.toLowerCase().includes(searchVal) || p.code.toLowerCase().includes(searchVal) || p.description.toLowerCase().includes(searchVal);
+                if (activeFilter === 'available') return matchSearch && p.stock > 0;
+                if (activeFilter === 'low') return matchSearch && p.stock > 0 && p.stock < 10;
+                return matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full py-12 text-center bg-white rounded-2xl border border-dashed border-gray-300 p-8">
+                        <span class="text-4xl block mb-2">🔍</span>
+                        <h4 class="font-bold text-gray-700 text-base">Tiada Bouquet Ditemui</h4>
+                        <p class="text-xs text-gray-500 mt-1">Sila cuba carian lain atau ubah penapis di atas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(p => {
+                const isOut = p.stock <= 0;
+                const isLow = p.stock > 0 && p.stock < 10;
+                
+                let stockBadgeClass = "bg-emerald-100 text-emerald-800 border-emerald-200";
+                let stockText = `Baki: ${p.stock} pcs`;
+
+                if (isOut) {
+                    stockBadgeClass = "bg-red-100 text-red-700 border-red-200 font-bold";
+                    stockText = "HABIS STOK (0 pcs)";
+                } else if (isLow) {
+                    stockBadgeClass = "bg-amber-100 text-amber-800 border-amber-200 font-bold";
+                    stockText = `Baki Terhad: ${p.stock} pcs!`;
+                }
+
+                const cardHtml = `
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden group">
+                        
+                        <!-- Image Container -->
+                        <div class="relative aspect-square overflow-hidden bg-gray-100">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.src='https://placehold.co/600x600/ffeee6/ee4d2d?text=SK+Alma+Jaya'">
+                            <span class="absolute top-3 left-3 bg-shopee text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-md uppercase tracking-wider">
+                                ${p.badge}
+                            </span>
+                            <span class="absolute top-3 right-3 text-[11px] px-2.5 py-1 rounded-full border backdrop-blur-md font-semibold ${stockBadgeClass} shadow-sm">
+                                ${stockText}
+                            </span>
+                        </div>
+
+                        <!-- Content Details -->
+                        <div class="p-5 flex-1 flex flex-col justify-between">
+                            <div>
+                                <div class="text-[11px] font-bold text-shopee uppercase tracking-wider mb-1">${p.code}</div>
+                                <h3 class="font-extrabold text-gray-900 text-base leading-snug group-hover:text-shopee transition-colors">${p.name}</h3>
+                                <p class="text-xs text-gray-500 mt-1 line-clamp-2">${p.description}</p>
+                            </div>
+
+                            <div class="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                                <div>
+                                    <span class="text-[10px] text-gray-400 block font-medium">HARGA SEUNIT</span>
+                                    <span class="text-xl font-black text-gray-900">RM ${p.price.toFixed(2)}</span>
+                                </div>
+                                
+                                <button onclick="openCheckoutModal('${p.id}')" ${isOut ? 'disabled' : ''} 
+                                    class="px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center space-x-1.5 ${isOut ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none' : 'bg-shopee hover:bg-shopee-hover text-white active:scale-95'}">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                    <span>${isOut ? 'Habis Stok' : 'Tempah Now'}</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        function filterProducts() {
+            renderProducts();
+        }
+
+        function setFilter(type) {
+            activeFilter = type;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-shopee', 'text-white', 'shadow-sm');
+                btn.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+            });
+            const activeBtn = document.getElementById(`filter-${type}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+                activeBtn.classList.add('bg-shopee', 'text-white', 'shadow-sm');
+            }
+            renderProducts();
+        }
+
+        function scrollToProducts() {
+            document.getElementById('productsSection').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // ================= CUSTOMER CHECKOUT & ORDERING ================= //
+
+        function openCheckoutModal(productId) {
+            const product = products.find(p => p.id === productId) || products[0];
+            if (!product || product.stock <= 0) {
+                showToast("⚠️ Maaf, bouquet ini telah habis stok!", "error");
+                return;
+            }
+
+            selectedProductForCheckout = product;
+            
+            // Populate Dropdown
+            const selectEl = document.getElementById('formProductSelect');
+            selectEl.innerHTML = '';
+            products.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.text = `${p.code} - ${p.name} (RM ${p.price.toFixed(2)}) ${p.stock <= 0 ? '[HABIS STOK]' : `[Baki: ${p.stock}]`}`;
+                opt.disabled = p.stock <= 0;
+                if (p.id === product.id) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+
+            document.getElementById('formQty').value = 1;
+            updateFormProductSelection();
+
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function updateFormProductSelection() {
+            const selectEl = document.getElementById('formProductSelect');
+            const selectedId = selectEl.value;
+            selectedProductForCheckout = products.find(p => p.id === selectedId);
+
+            if (!selectedProductForCheckout) return;
+
+            const previewBox = document.getElementById('modalSelectedProductPreview');
+            previewBox.innerHTML = `
+                <img src="${selectedProductForCheckout.image}" class="w-14 h-14 rounded-lg object-cover border border-orange-200" onerror="this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
+                <div class="flex-1 min-w-0">
+                    <span class="text-[10px] font-bold text-shopee uppercase">${selectedProductForCheckout.code}</span>
+                    <h5 class="font-bold text-xs text-gray-900 truncate">${selectedProductForCheckout.name}</h5>
+                    <div class="text-xs text-gray-600 font-semibold mt-0.5">RM ${selectedProductForCheckout.price.toFixed(2)} seunit</div>
+                </div>
+            `;
+
+            document.getElementById('formAvailableStock').innerText = selectedProductForCheckout.stock;
+            
+            let currentQty = parseInt(document.getElementById('formQty').value) || 1;
+            if (currentQty > selectedProductForCheckout.stock) {
+                document.getElementById('formQty').value = selectedProductForCheckout.stock;
+            }
+            calculateFormTotal();
+        }
+
+        function adjustQty(delta) {
+            if (!selectedProductForCheckout) return;
+            const qtyInput = document.getElementById('formQty');
+            let current = parseInt(qtyInput.value) || 1;
+            let next = current + delta;
+
+            if (next < 1) next = 1;
+            if (next > selectedProductForCheckout.stock) {
+                showToast(`⚠️ Kuantiti maksimum mengikut baki stok ialah ${selectedProductForCheckout.stock} pcs!`, "warning");
+                next = selectedProductForCheckout.stock;
+            }
+
+            qtyInput.value = next;
+            calculateFormTotal();
+        }
+
+        function calculateFormTotal() {
+            if (!selectedProductForCheckout) return;
+            const qty = parseInt(document.getElementById('formQty').value) || 1;
+            const total = selectedProductForCheckout.price * qty;
+            document.getElementById('formTotalPrice').innerText = `RM ${total.toFixed(2)}`;
+        }
+
+        function handleOrderSubmit(e) {
+            e.preventDefault();
+
+            if (!selectedProductForCheckout) return;
+
+            const studentName = document.getElementById('formStudentName').value.trim();
+            const className = document.getElementById('formClassName').value.trim();
+            const phone = document.getElementById('formPhone').value.trim();
+            const message = document.getElementById('formMessage').value.trim();
+            const qty = parseInt(document.getElementById('formQty').value) || 1;
+
+            if (!studentName || !phone) {
+                showToast("Sila lengkapkan nama anak dan no telefon!", "warning");
+                return;
+            }
+
+            const pIndex = products.findIndex(p => p.id === selectedProductForCheckout.id);
+            if (pIndex === -1) return;
+
+            const orderId = 'SKAJ-' + Math.floor(100000 + Math.random() * 900000);
+            const orderDate = new Date().toLocaleString('ms-MY', { dateStyle: 'medium', timeStyle: 'short' });
+            const totalPrice = selectedProductForCheckout.price * qty;
+
+            const newOrder = {
+                id: orderId,
+                date: orderDate,
+                studentName: studentName,
+                className: className || '-',
+                phone: phone,
+                productCode: selectedProductForCheckout.code,
+                productName: selectedProductForCheckout.name,
+                unitPrice: selectedProductForCheckout.price,
+                qty: qty,
+                totalPrice: totalPrice,
+                message: message,
+                status: 'Diterima'
+            };
+
+            const submitBtn = document.getElementById('btnSubmitOrder');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<span>Memproses Tempahan...</span>`;
+
+            if (isFirebaseConnected && dbRef) {
+                const productStockRef = dbRef.ref(`skaj_bouquet/products/${pIndex}/stock`);
+                
+                productStockRef.transaction((currentStock) => {
+                    if (currentStock !== null && currentStock >= qty) {
+                        return currentStock - qty;
+                    } else {
+                        return;
+                    }
+                }, (error, committed) => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Hantar Tempahan Ke WhatsApp Peniaga</span>`;
+
+                    if (error || !committed) {
+                        showToast("⚠️ Tempahan gagal! Baki stok telah habis.", "error");
+                    } else {
+                        dbRef.ref('skaj_bouquet/orders/' + orderId).set(newOrder);
+                        closeCheckoutModal();
+                        showSuccessModal(newOrder);
+                    }
+                });
+            } else {
+                if (products[pIndex].stock < qty) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `<span>Hantar Tempahan Ke WhatsApp Peniaga</span>`;
+                    showToast("⚠️ Stok tidak mencukupi!", "error");
+                    return;
+                }
+
+                products[pIndex].stock -= qty;
+                orders.unshift(newOrder);
+                saveProductsToLocalStorage();
+                saveOrdersToLocalStorage();
+                renderProducts();
+
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `<span>Hantar Tempahan Ke WhatsApp Peniaga</span>`;
+                closeCheckoutModal();
+                showSuccessModal(newOrder);
+            }
+
+            document.getElementById('formStudentName').value = '';
+            document.getElementById('formClassName').value = '';
+            document.getElementById('formPhone').value = '';
+            document.getElementById('formMessage').value = '';
+        }
+
+        function showSuccessModal(order) {
+            const receiptBox = document.getElementById('successReceiptBox');
+            receiptBox.innerHTML = `
+                <div class="flex justify-between font-mono text-[11px] text-gray-500 border-b border-gray-200 pb-1 mb-2">
+                    <span>ID TEMPAHAN: <strong>${order.id}</strong></span>
+                    <span>${order.date}</span>
+                </div>
+                <div class="font-bold text-gray-800">Nama Pelajar: ${escapeHtml(order.studentName)} (${escapeHtml(order.className)})</div>
+                <div class="text-gray-600">No. WhatsApp Ibu Bapa: ${escapeHtml(order.phone)}</div>
+                <div class="border-t border-dashed border-gray-200 pt-2 mt-2">
+                    <div class="font-bold text-shopee">${order.productCode} - ${order.productName}</div>
+                    <div class="flex justify-between mt-0.5">
+                        <span>${order.qty} pcs x RM ${order.unitPrice.toFixed(2)}</span>
+                        <span class="font-bold text-gray-900">RM ${order.totalPrice.toFixed(2)}</span>
+                    </div>
+                </div>
+                ${order.message ? `<div class="bg-white p-2 rounded border border-gray-200 text-[11px] text-gray-600 italic mt-2">" ${escapeHtml(order.message)} "</div>` : ''}
+            `;
+
+            let waText = `*TEMPAHAN BOUQUET GRADUASI SK ALMA JAYA* 🎓\n`;
+            waText += `------------------------------------\n`;
+            waText += `*ID Pesanan:* ${order.id}\n`;
+            waText += `*Nama Anak:* ${order.studentName}\n`;
+            waText += `*Kelas:* ${order.className}\n`;
+            waText += `*No. Tel Ibu Bapa:* ${order.phone}\n\n`;
+            waText += `*Item:* ${order.productCode} - ${order.productName}\n`;
+            waText += `*Kuantiti:* ${order.qty} pcs\n`;
+            waText += `*Jumlah Bayaran:* RM ${order.totalPrice.toFixed(2)}\n`;
+            if (order.message) {
+                waText += `*Kad Ucapan:* "${order.message}"\n`;
+            }
+            waText += `------------------------------------\n`;
+            waText += `Saya telah membuat tempahan di web app. Sila sahkan penerimaan stok. Terima kasih!`;
+
+            const encodedMsg = encodeURIComponent(waText);
+            const waUrl = `https://wa.me/${whatsappNumber}?text=${encodedMsg}`;
+            
+            document.getElementById('btnSendWhatsApp').href = waUrl;
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // ================= ADMIN DASHBOARD LOGIC ================= //
+
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            if (isAdminLoggedIn) {
+                showAdminDashboard();
+            } else {
+                document.getElementById('adminPinScreen').classList.remove('hidden');
+                document.getElementById('adminDashboardScreen').classList.add('hidden');
+                document.getElementById('adminPinInput').value = '';
+                document.getElementById('adminPinError').classList.add('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function verifyAdminPin() {
+            const inputPin = document.getElementById('adminPinInput').value.trim();
+            if (inputPin === adminPin) {
+                isAdminLoggedIn = true;
+                showAdminDashboard();
+                showToast("Akses Admin Disahkan!", "success");
+            } else {
+                document.getElementById('adminPinError').classList.remove('hidden');
+            }
+        }
+
+        function showAdminDashboard() {
+            document.getElementById('adminPinScreen').classList.add('hidden');
+            document.getElementById('adminDashboardScreen').classList.remove('hidden');
+            document.getElementById('adminWaInput').value = whatsappNumber;
+            document.getElementById('adminDbStatusTag').innerText = isFirebaseConnected ? "Mod: Firebase Database (Active)" : "Mod: Local Storage";
+            renderAdminStockControl();
+            renderAdminOrdersList();
+        }
+
+        function switchAdminTab(tabName) {
+            document.querySelectorAll('.admin-tab').forEach(b => {
+                b.classList.remove('bg-white', 'text-shopee', 'shadow-sm');
+                b.classList.add('bg-transparent', 'text-gray-600');
+            });
+
+            document.getElementById('adminTabStock').classList.add('hidden');
+            document.getElementById('adminTabOrders').classList.add('hidden');
+            document.getElementById('adminTabSettings').classList.add('hidden');
+
+            if (tabName === 'stock') {
+                document.getElementById('tabBtnStock').classList.add('bg-white', 'text-shopee', 'shadow-sm');
+                document.getElementById('adminTabStock').classList.remove('hidden');
+            } else if (tabName === 'orders') {
+                document.getElementById('tabBtnOrders').classList.add('bg-white', 'text-shopee', 'shadow-sm');
+                document.getElementById('adminTabOrders').classList.remove('hidden');
+            } else if (tabName === 'settings') {
+                document.getElementById('tabBtnSettings').classList.add('bg-white', 'text-shopee', 'shadow-sm');
+                document.getElementById('adminTabSettings').classList.remove('hidden');
+            }
+        }
+
+        function renderAdminStockControl() {
+            const container = document.getElementById('adminStockControlList');
+            container.innerHTML = '';
+
+            products.forEach((p, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4";
+                card.innerHTML = `
+                    <div class="flex items-center space-x-3">
+                        <img src="${p.image}" class="w-12 h-12 rounded-lg object-cover border border-gray-200" onerror="this.src='https://placehold.co/100x100/ffeee6/ee4d2d?text=SKAJ'">
+                        <div>
+                            <span class="text-[10px] font-bold text-shopee uppercase">${p.code}</span>
+                            <h5 class="font-bold text-sm text-gray-900">${p.name}</h5>
+                            <div class="text-xs text-gray-500">Harga: RM ${p.price.toFixed(2)} | Baki Stok: <strong class="${p.stock <= 0 ? 'text-red-600 font-extrabold' : 'text-emerald-600 font-bold'}">${p.stock} pcs</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                        <button onclick="updateSingleStock(${index}, -5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">-5</button>
+                        <input type="number" id="inputStock_${index}" value="${p.stock}" min="0" class="w-16 text-center font-bold text-sm bg-gray-50 border border-gray-300 rounded-lg py-1 focus:ring-2 focus:ring-shopee focus:outline-none">
+                        <button onclick="updateSingleStock(${index}, 5)" class="px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-lg transition">+5</button>
+                        
+                        <button onclick="saveStockFromInput(${index})" class="bg-gray-900 hover:bg-black text-white font-bold text-xs px-3 py-1.5 rounded-lg transition ml-2">
+                            Simpan
+                        </button>
+                        <button onclick="resetSingleStockTo30(${index})" title="Reset ke 30" class="bg-orange-100 text-shopee hover:bg-shopee hover:text-white font-bold text-xs px-3 py-1.5 rounded-lg transition">
+                            Set 30
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateSingleStock(index, delta) {
+            if (!products[index]) return;
+            let nextStock = products[index].stock + delta;
+            if (nextStock < 0) nextStock = 0;
+            
+            saveStockToDatabase(index, nextStock);
+        }
+
+        function saveStockFromInput(index) {
+            const inputVal = parseInt(document.getElementById(`inputStock_${index}`).value);
+            if (!isNaN(inputVal) && inputVal >= 0) {
+                saveStockToDatabase(index, inputVal);
+            }
+        }
+
+        function resetSingleStockTo30(index) {
+            saveStockToDatabase(index, 30);
+        }
+
+        function saveStockToDatabase(index, newStock) {
+            products[index].stock = newStock;
+            
+            if (isFirebaseConnected && dbRef) {
+                dbRef.ref(`skaj_bouquet/products/${index}/stock`).set(newStock);
+                showToast(`Stok ${products[index].code} dikemaskini: ${newStock} pcs`, "success");
+            } else {
+                saveProductsToLocalStorage();
+                renderProducts();
+                renderAdminStockControl();
+                showToast(`Stok ${products[index].code} dikemaskini: ${newStock} pcs`, "success");
+            }
+        }
+
+        function resetAllStockTo30() {
+            showCustomConfirm(
+                "Reset Semua Stok Ke 30 Pcs?",
+                "Adakah anda pasti mahu mengembalikan kuantiti kesemua 5 design bouquet ke 30 pcs?",
+                () => {
+                    products.forEach(p => p.stock = 30);
+                    if (isFirebaseConnected && dbRef) {
+                        dbRef.ref('skaj_bouquet/products').set(products);
+                        showToast("Semua stok direset ke 30 pcs!", "success");
+                    } else {
+                        saveProductsToLocalStorage();
+                        renderProducts();
+                        renderAdminStockControl();
+                        showToast("Semua stok direset ke 30 pcs!", "success");
+                    }
+                }
+            );
+        }
+
+        function renderAdminOrdersList() {
+            const container = document.getElementById('adminOrdersList');
+            document.getElementById('adminOrderCount').innerText = orders.length;
+
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="py-8 text-center text-gray-500 text-xs">Belum ada sebarang tempahan diterima.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach((ord) => {
+                const itemHtml = `
+                    <div class="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+                        <div class="space-y-1">
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold text-shopee">${ord.id}</span>
+                                <span class="text-[10px] text-gray-400">| ${ord.date}</span>
+                                <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">${ord.status}</span>
+                            </div>
+                            <div class="font-bold text-sm text-gray-900">${escapeHtml(ord.studentName)} <span class="text-gray-500 font-normal">(${escapeHtml(ord.className)})</span></div>
+                            <div class="text-gray-600">No. WhatsApp: ${escapeHtml(ord.phone)}</div>
+                            <div class="text-gray-700"><strong>Item:</strong> ${ord.productCode} - ${ord.productName} (${ord.qty} pcs)</div>
+                            ${ord.message ? `<div class="text-gray-500 italic bg-gray-50 p-2 rounded">" ${escapeHtml(ord.message)} "</div>` : ''}
+                        </div>
+
+                        <div class="flex md:flex-col items-end justify-between border-t md:border-t-0 pt-2 md:pt-0 border-gray-100">
+                            <span class="text-base font-black text-gray-900">RM ${ord.totalPrice.toFixed(2)}</span>
+                            <button onclick="deleteSingleOrder('${ord.id}')" class="text-red-500 hover:text-red-700 font-semibold text-[11px] mt-1 hover:underline">
+                                Padam Rekod
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += itemHtml;
+            });
+        }
+
+        function deleteSingleOrder(orderId) {
+            if (isFirebaseConnected && dbRef) {
+                dbRef.ref(`skaj_bouquet/orders/${orderId}`).remove();
+                showToast("Rekod dipadam", "info");
+            } else {
+                orders = orders.filter(o => o.id !== orderId);
+                saveOrdersToLocalStorage();
+                renderAdminOrdersList();
+                showToast("Rekod tempahan dipadam", "info");
+            }
+        }
+
+        function clearAllOrders() {
+            showCustomConfirm(
+                "Padam Semua Tempahan?",
+                "Adakah anda pasti mahu mengosongkan sejarah tempahan?",
+                () => {
+                    if (isFirebaseConnected && dbRef) {
+                        dbRef.ref('skaj_bouquet/orders').remove();
+                        showToast("Semua rekod dipadam!", "info");
+                    } else {
+                        orders = [];
+                        saveOrdersToLocalStorage();
+                        renderAdminOrdersList();
+                        showToast("Rekod dibersihkan", "info");
+                    }
+                }
+            );
+        }
+
+        function saveAdminSettings() {
+            const newWa = document.getElementById('adminWaInput').value.trim();
+            const newPin = document.getElementById('adminNewPinInput').value.trim();
+
+            if (newWa) {
+                whatsappNumber = newWa.replace(/\D/g, '');
+                localStorage.setItem('skaj_wa_number', whatsappNumber);
+                updateFooterInfo();
+            }
+
+            if (newPin) {
+                adminPin = newPin;
+                if (isFirebaseConnected && dbRef) {
+                    dbRef.ref('skaj_bouquet/admin_pin').set(adminPin);
+                } else {
+                    localStorage.setItem('skaj_admin_pin', adminPin);
+                }
+                document.getElementById('adminNewPinInput').value = '';
+            }
+
+            showToast("Tetapan Admin Disimpan!", "success");
+        }
+
+        // ================= FIREBASE CONFIG MODAL HANDLERS ================= //
+
+        function openFirebaseConfigModal() {
+            const savedConfig = localStorage.getItem('skaj_firebase_config');
+            if (savedConfig) {
+                try {
+                    const parsed = JSON.parse(savedConfig);
+                    document.getElementById('cfgDatabaseURL').value = parsed.databaseURL || '';
+                    document.getElementById('cfgApiKey').value = parsed.apiKey || '';
+                    document.getElementById('cfgProjectId').value = parsed.projectId || '';
+                } catch(e) {}
+            }
+            document.getElementById('firebaseConfigModal').classList.remove('hidden');
+        }
+
+        function closeFirebaseConfigModal() {
+            document.getElementById('firebaseConfigModal').classList.add('hidden');
+        }
+
+        function saveFirebaseCustomConfig() {
+            const dbUrl = document.getElementById('cfgDatabaseURL').value.trim();
+            const apiKey = document.getElementById('cfgApiKey').value.trim();
+            const projectId = document.getElementById('cfgProjectId').value.trim();
+
+            if (!dbUrl) {
+                showToast("Sila masukkan databaseURL Firebase!", "warning");
+                return;
+            }
+
+            const configObj = {
+                databaseURL: dbUrl,
+                apiKey: apiKey || 'dummy-key',
+                projectId: projectId || 'dummy-project'
+            };
+
+            localStorage.setItem('skaj_firebase_config', JSON.stringify(configObj));
+            closeFirebaseConfigModal();
+            showToast("Konfigurasi Firebase disimpan! Memuat semula...", "success");
+            
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+        }
+
+        function resetToLocalDemoMode() {
+            localStorage.removeItem('skaj_firebase_config');
+            closeFirebaseConfigModal();
+            showToast("Kembali ke Mod Lokal Storage", "info");
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+
+        // ================= CUSTOMER ORDER TRACKER ================= //
+
+        function openCustomerOrdersModal() {
+            const container = document.getElementById('customerOrdersList');
+            document.getElementById('customerOrdersModal').classList.remove('hidden');
+
+            if (orders.length === 0) {
+                container.innerHTML = `<div class="py-8 text-center text-gray-400 text-xs">Anda belum membuat sebarang tempahan.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            orders.forEach(ord => {
+                container.innerHTML += `
+                    <div class="bg-orange-50/50 p-3.5 rounded-xl border border-orange-100 text-xs space-y-1">
+                        <div class="flex justify-between font-bold text-gray-800">
+                            <span>${ord.productCode} - ${ord.productName}</span>
+                            <span class="text-shopee">RM ${ord.totalPrice.toFixed(2)}</span>
+                        </div>
+                        <div class="text-gray-600">Pelajar: <strong>${escapeHtml(ord.studentName)}</strong> (${ord.qty} pcs)</div>
+                        <div class="text-[10px] text-gray-400 flex justify-between pt-1">
+                            <span>ID: ${ord.id}</span>
+                            <span>${ord.date}</span>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function closeCustomerOrdersModal() {
+            document.getElementById('customerOrdersModal').classList.add('hidden');
+        }
+
+        // ================= UTILITIES ================= //
+
+        function showToast(msg, type = "success") {
+            const toast = document.getElementById('toastNotification');
+            const toastMsg = document.getElementById('toastMessage');
+            const toastIcon = document.getElementById('toastIcon');
+
+            toastMsg.innerText = msg;
+            if (type === "success") toastIcon.innerText = "✅";
+            else if (type === "error") toastIcon.innerText = "❌";
+            else if (type === "warning") toastIcon.innerText = "⚠️";
+            else toastIcon.innerText = "ℹ️";
+
+            toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+            
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+            }, 3000);
+        }
+
+        function showCustomConfirm(title, message, onConfirm) {
+            const modal = document.getElementById('customDialogModal');
+            document.getElementById('dialogTitle').innerText = title;
+            document.getElementById('dialogText').innerText = message;
+            
+            const btnContainer = document.getElementById('dialogButtons');
+            btnContainer.innerHTML = '';
+
+            const btnCancel = document.createElement('button');
+            btnCancel.className = "px-4 py-2 bg-gray-200 text-gray-700 rounded-xl font-bold text-xs hover:bg-gray-300 transition";
+            btnCancel.innerText = "Batal";
+            btnCancel.onclick = () => modal.classList.add('hidden');
+
+            const btnYes = document.createElement('button');
+            btnYes.className = "px-4 py-2 bg-shopee text-white rounded-xl font-bold text-xs hover:bg-shopee-hover transition shadow";
+            btnYes.innerText = "Ya, Teruskan";
+            btnYes.onclick = () => {
+                modal.classList.add('hidden');
+                if (onConfirm) onConfirm();
+            };
+
+            btnContainer.appendChild(btnCancel);
+            btnContainer.appendChild(btnYes);
+            modal.classList.remove('hidden');
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // Run Initialization on Load
+        window.addEventListener('DOMContentLoaded', () => {
+            initApp();
+        });
+    </script>
+</body>
+</html>
